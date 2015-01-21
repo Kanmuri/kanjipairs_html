@@ -7,10 +7,19 @@ KanjiPairs = function(xmlKanjiData, canvasId) {
 	this.cardFill = 'blue';
 	this.cardStroke = 'outside 1px black';
 
-	this.textPosX = 12.5;
-	this.textPosY = 25;
-	this.textFont = '75px';
-	this.textFill = 'white';
+	this.kanjiTextProps = {
+		x: 12.5,
+		y: 25,
+		font: '75px',
+		fill: 'white'
+	};
+
+	this.readingTextProps = {
+		x: 5,
+		y: 10,
+		font: '18px',
+		fill: 'white',
+	};
 
 	this.canvasId = canvasId;
 	this.pairsCanvas = oCanvas.create({
@@ -169,7 +178,8 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 	return kanjiArray;
 }
 
-KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos) {
+KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
+	var that = this;
 	var newCardBack = this.pairsCanvas.display.rectangle({
 		x: xPos,
 		y: yPos,
@@ -180,19 +190,34 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos) {
 	});
 
 	var kanjiCharacter = this.readings[kanjiItem.kanjiIndex];
-	var kanjiTextObject = this.pairsCanvas.display.text({
-		x: 12.5,
-		y: 25,
-		text: kanjiCharacter.literal,
-		font: this.textFont,
-		fill: this.textFill
-	});
+	var kanjiTextObject = this.pairsCanvas.display.text(
+		$.extend({text: kanjiCharacter.literal}, this.kanjiTextProps)
+	);
+
+	var readingTextObject = this.pairsCanvas.display.text(
+		$.extend({text: kanjiItem.selectedReading, opacity: 0}, this.readingTextProps)
+	);
 
 	newCardBack.kanjiItem = kanjiItem;
-
 	newCardBack.addChild(kanjiTextObject);
+	newCardBack.addChild(readingTextObject);
 
-	this.pairsCanvas.addChild(newCardBack);
+	newCardBack.bind('click tap', function(){
+		that.toggleCard(this);
+	});
+
+	this.pairsCanvas.addChild(newCardBack, delayRedraw);
+}
+
+KanjiPairs.prototype.toggleCard = function(cardObject) {
+	for(var i = 0; i < cardObject.children.length; i++) {
+		var currChild = cardObject.children[i];
+		var targetOpacity = (currChild.opacity === 1 ? 0 : 1);
+		currChild.animate({opacity: targetOpacity}, {
+			duration: 'short',
+			easing: 'ease-in-out-quad'
+		});
+	}
 }
 
 KanjiPairs.prototype.layoutCards = function(numberOfCards) {
@@ -207,13 +232,14 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 	var yPos = 0;
 
 	$.each(kanjiSet, function(index, currKanji) {
-		that.addCard(currKanji, xPos, yPos);
+		that.addCard(currKanji, xPos, yPos, true);
 		xPos += that.cardWidth + that.cardSpacing;
 		if((xPos + that.cardWidth) > canvasWidth) {
 			yPos += that.cardHeight + that.cardSpacing;
 			xPos = 0;
 		}
 	});
+	this.pairsCanvas.redraw();
 }
 
 $(document).ready(function() {
