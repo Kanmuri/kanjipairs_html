@@ -9,7 +9,7 @@ KanjiPairs = function(xmlKanjiData, canvasId) {
 
 	this.kanjiTextProps = {
 		x: 12.5,
-		y: 25,
+		y: 30,
 		font: '75px',
 		fill: 'white'
 	};
@@ -17,7 +17,7 @@ KanjiPairs = function(xmlKanjiData, canvasId) {
 	this.readingTextProps = {
 		x: 5,
 		y: 10,
-		font: '18px',
+		font: '16px',
 		fill: 'white',
 	};
 
@@ -31,6 +31,8 @@ KanjiPairs = function(xmlKanjiData, canvasId) {
 	this.readings = this.extractReadings(this.kanjiData);
 	this.indexedReadings = this.indexReadings(this.readings);
 	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
+
+	this.flippedCards = [];
 };
 
 KanjiPairs.prototype.extractReadings = function(xmlKanjiData) {
@@ -49,14 +51,15 @@ KanjiPairs.prototype.extractReadings = function(xmlKanjiData) {
 			};
 			currReadings.push(newReading)
 		});
-		var nameReadings = $(el).find('nanori');
+		//The name readings are nice and all, but are probably best learned separately from the on and kun readings
+		/*var nameReadings = $(el).find('nanori');
 		nameReadings.each(function(index, el) {
 			var newReading = {
 				readingType: 'Name',
 				readingText: $(el).text()
 			};
 			currReadings.push(newReading);
-		});
+		});*/
 		currChar.readings = currReadings;
 		extractedChars.push(currChar);
 	});
@@ -202,17 +205,51 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 	newCardBack.addChild(kanjiTextObject);
 	newCardBack.addChild(readingTextObject);
 
-	newCardBack.bind('click tap', function(){
-		that.toggleCard(this);
-	});
+	newCardBack.clickHandler = function(){
+		if(that.flippedCards.length < 2) {
+			that.flippedCards.push(this);
+			if(!this.flipped) {
+				that.toggleCard(this);
+				this.flipped = true;
+			}
+			if(that.flippedCards.length > 1) {
+				if(that.flippedCards[0].kanjiItem.selectedReading == this.kanjiItem.selectedReading) {
+					that.flippedCards[0].unbind('click tap', that.flippedCards[0].clickHandler);
+					this.unbind('click tap', this.clickHandler);
+					that.toggleCard(that.flippedCards[0], true);
+					that.toggleCard(this, true);
+				}
+				else {
+					(function(firstCard, secondCard, kanjiPairsObj){
+						setTimeout(function(){
+							kanjiPairsObj.toggleCard(firstCard);
+							firstCard.flipped = false;
+							kanjiPairsObj.toggleCard(secondCard);
+							secondCard.flipped = false;
+						}, 1000);
+					})(that.flippedCards[0], this, that);
+				}
+				while(that.flippedCards.length) {
+					that.flippedCards.pop();
+				}
+			}
+		}
+	};
+
+	newCardBack.bind('click tap', newCardBack.clickHandler);
 
 	this.pairsCanvas.addChild(newCardBack, delayRedraw);
 }
 
-KanjiPairs.prototype.toggleCard = function(cardObject) {
+KanjiPairs.prototype.toggleCard = function(cardObject, showBothSides) {
 	for(var i = 0; i < cardObject.children.length; i++) {
 		var currChild = cardObject.children[i];
-		var targetOpacity = (currChild.opacity === 1 ? 0 : 1);
+		if((typeof showBothSides !== 'undefined') && showBothSides) {
+			var targetOpacity = 1;
+		}
+		else {
+			var targetOpacity = (currChild.opacity === 1 ? 0 : 1);
+		}
 		currChild.animate({opacity: targetOpacity}, {
 			duration: 'short',
 			easing: 'ease-in-out-quad'
