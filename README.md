@@ -8,3 +8,11 @@ This file is Copyright the [Electronic Dictionary Research and Development Group
 
 The file itself is available from the [KANJIDIC2 project page](http://www.csse.monash.edu.au/~jwb/kanjidic2/).
 The version I am using is also available in the kanjidic2 directory/folder.
+
+## How to play
+* Click on the kanji one at a time to "flip over" the cards
+* As the card is flipped over a randomly chosen reading (on or kun) will be shown
+* Once a pair of cards is flipped over, one of two things will happen
+  1) If the readings of those two cards match, then both "sides" of the card become visible and those cards are no longer clickable
+  2) If the readings of those two cards don't match, then the cards are flipped over after a small delay
+
