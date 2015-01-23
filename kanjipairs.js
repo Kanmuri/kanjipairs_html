@@ -53,15 +53,34 @@ KanjiPairs.prototype.extractReadings = function(xmlKanjiData) {
 			currReadings.push(newReading)
 		});
 		//The name readings are nice and all, but are probably best learned separately from the on and kun readings
-		/*var nameReadings = $(el).find('nanori');
+		var nameReadings = $(el).find('nanori');
+		var currNameReadings = [];
 		nameReadings.each(function(index, el) {
 			var newReading = {
 				readingType: 'Name',
 				readingText: $(el).text()
 			};
-			currReadings.push(newReading);
-		});*/
+			currNameReadings.push(newReading);
+		});
 		currChar.readings = currReadings;
+		currChar.nameReadings = currNameReadings;
+
+		//Grab some extra metadata for filtering purposes later on
+		var miscMetaData = $(el).find('misc');
+		var currMeta = {
+			grade: $(miscMetaData).find('grade').text(),
+			strokeCount: $(miscMetaData).find('stroke_count').text(),
+			frequency: $(miscMetaData).find('freq').text(),
+			radicalNames: [],
+			jlpt: $(miscMetaData).find('jlpt').text()
+		};
+		var radNames = $(miscMetaData).find('rad_name')
+		radNames.each(function(index, el) {
+			currMeta.radicalNames.push($(el).text());
+		});
+
+		currChar.miscMetaData = currMeta;
+
 		extractedChars.push(currChar);
 	});
 
