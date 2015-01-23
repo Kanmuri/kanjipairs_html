@@ -6,6 +6,7 @@ KanjiPairs = function(xmlKanjiData, canvasId) {
 	this.cardSpacing = 10;
 	this.cardFill = 'blue';
 	this.cardStroke = 'outside 1px black';
+	this.cardShadow = '5px 5px 10px gray';
 
 	this.kanjiTextProps = {
 		x: 12.5,
@@ -154,7 +155,7 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 				else {
 					var randomKanji = currReadingKanji[numKanjiForReading * Math.random() << 0];
 					var kanjiItem = {kanjiIndex: randomKanji, selectedReading: currReading};
-					var kanjiOkToAdd = ($.inArray(randomKanji, kanjiItem) === -1);
+					var kanjiOkToAdd = (!this.checkForKanji(kanjiArray, kanjiItem));
 				}
 
 
@@ -181,6 +182,18 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 	return kanjiArray;
 }
 
+KanjiPairs.prototype.checkForKanji = function(kanjiArray, kanjiItem) {
+	var matchFound = false;
+	$.each(kanjiArray, function(index, val) {
+		if((typeof val !== 'undefined') && val.kanjiIndex == kanjiItem.kanjiIndex && val.selectedReading == kanjiItem.selectedReading) {
+			matchFound = true;
+			return false; //return false breaks us out of the .each() loop
+		}
+	});
+
+	return matchFound;
+}
+
 KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 	var that = this;
 	var newCardBack = this.pairsCanvas.display.rectangle({
@@ -189,48 +202,53 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 		width: this.cardWidth,
 		height: this.cardHeight,
 		fill: this.cardFill,
-		stroke: this.cardStroke
+		stroke: this.cardStroke,
+		shadow: this.cardShadow
 	});
 
 	var kanjiCharacter = this.readings[kanjiItem.kanjiIndex];
 	var kanjiTextObject = this.pairsCanvas.display.text(
 		$.extend({text: kanjiCharacter.literal}, this.kanjiTextProps)
 	);
+	kanjiTextObject.visibleState = 'unflipped';
 
 	var readingTextObject = this.pairsCanvas.display.text(
 		$.extend({text: kanjiItem.selectedReading, opacity: 0}, this.readingTextProps)
 	);
+	readingTextObject.visibleState = 'flipped';
 
 	newCardBack.kanjiItem = kanjiItem;
 	newCardBack.addChild(kanjiTextObject);
 	newCardBack.addChild(readingTextObject);
 
 	newCardBack.clickHandler = function(){
-		if(that.flippedCards.length < 2) {
+		if($.inArray(this, that.flippedCards) === -1) {
 			that.flippedCards.push(this);
-			if(!this.flipped) {
-				that.toggleCard(this);
-				this.flipped = true;
-			}
-			if(that.flippedCards.length > 1) {
-				if(that.flippedCards[0].kanjiItem.selectedReading == this.kanjiItem.selectedReading) {
-					that.flippedCards[0].unbind('click tap', that.flippedCards[0].clickHandler);
-					this.unbind('click tap', this.clickHandler);
-					that.toggleCard(that.flippedCards[0], true);
-					that.toggleCard(this, true);
+			if(that.flippedCards.length < 3 && (that.flippedCards[0] === this || that.flippedCards[1] === this)) {
+				if(!this.flipped) {
+					that.toggleCard(this, 'flipped');
+					this.flipped = true;
 				}
-				else {
-					(function(firstCard, secondCard, kanjiPairsObj){
-						setTimeout(function(){
-							kanjiPairsObj.toggleCard(firstCard);
-							firstCard.flipped = false;
-							kanjiPairsObj.toggleCard(secondCard);
-							secondCard.flipped = false;
-						}, 1000);
-					})(that.flippedCards[0], this, that);
-				}
-				while(that.flippedCards.length) {
-					that.flippedCards.pop();
+				if(that.flippedCards.length > 1) {
+					if(that.flippedCards[0].kanjiItem.selectedReading == this.kanjiItem.selectedReading) {
+						that.flippedCards[0].unbind('click tap', that.flippedCards[0].clickHandler);
+						this.unbind('click tap', this.clickHandler);
+						that.toggleCard(that.flippedCards[0], 'both');
+						that.toggleCard(this, 'both');
+					}
+					else {
+						(function(firstCard, secondCard, kanjiPairsObj){
+							setTimeout(function(){
+								kanjiPairsObj.toggleCard(firstCard, 'unflipped');
+								firstCard.flipped = false;
+								kanjiPairsObj.toggleCard(secondCard, 'unflipped');
+								secondCard.flipped = false;
+							}, 1500);
+						})(that.flippedCards[0], this, that);
+					}
+					while(that.flippedCards.length) {
+						that.flippedCards.pop();
+					}
 				}
 			}
 		}
@@ -241,14 +259,20 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 	this.pairsCanvas.addChild(newCardBack, delayRedraw);
 }
 
-KanjiPairs.prototype.toggleCard = function(cardObject, showBothSides) {
+KanjiPairs.prototype.toggleCard = function(cardObject, cardMode) {
 	for(var i = 0; i < cardObject.children.length; i++) {
 		var currChild = cardObject.children[i];
-		if((typeof showBothSides !== 'undefined') && showBothSides) {
-			var targetOpacity = 1;
-		}
-		else {
-			var targetOpacity = (currChild.opacity === 1 ? 0 : 1);
+		var targetOpacity = 0;
+		switch(cardMode) {
+			case 'flipped':
+				targetOpacity = (currChild.visibleState === 'flipped' ? 1 : 0);
+				break;
+			case 'unflipped':
+				targetOpacity = (currChild.visibleState === 'unflipped' ? 1 : 0);
+				break;
+			case 'both':
+				targetOpacity = 1;
+				break;
 		}
 		currChild.animate({opacity: targetOpacity}, {
 			duration: 'short',
