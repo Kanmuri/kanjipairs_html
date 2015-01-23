@@ -1,4 +1,4 @@
-KanjiPairs = function(xmlKanjiData, canvasId) {
+KanjiPairs = function(kanjiData, canvasId) {
 	var that = this;
 	//presets
 	this.cardWidth = 100;
@@ -28,63 +28,11 @@ KanjiPairs = function(xmlKanjiData, canvasId) {
 		background: 'white'
 	});
 
-	this.kanjiData = xmlKanjiData;
-	this.readings = this.extractReadings(this.kanjiData);
-	this.indexedReadings = this.indexReadings(this.readings);
+	this.kanjiData = kanjiData;
+	this.indexedReadings = this.indexReadings(this.kanjiData);
 	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
 
 	this.flippedCards = [];
-};
-
-KanjiPairs.prototype.extractReadings = function(xmlKanjiData) {
-	var kanjiData = $(xmlKanjiData);
-	var characters = kanjiData.find('character');
-	var extractedChars = [];
-	characters.each(function(index, el) {
-		var currChar = {};
-		currChar.literal = $(el).find('literal').text();
-		var currReadings = [];
-		var onKunReadings = $(el).find('reading[r_type="ja_on"], reading[r_type="ja_kun"]');
-		onKunReadings.each(function(index, el) {
-			var newReading = {
-				readingType: ($(el).attr('r_type') === 'ja_on' ? 'On' : 'Kun'),
-				readingText: $(el).text()
-			};
-			currReadings.push(newReading)
-		});
-		//The name readings are nice and all, but are probably best learned separately from the on and kun readings
-		var nameReadings = $(el).find('nanori');
-		var currNameReadings = [];
-		nameReadings.each(function(index, el) {
-			var newReading = {
-				readingType: 'Name',
-				readingText: $(el).text()
-			};
-			currNameReadings.push(newReading);
-		});
-		currChar.readings = currReadings;
-		currChar.nameReadings = currNameReadings;
-
-		//Grab some extra metadata for filtering purposes later on
-		var miscMetaData = $(el).find('misc');
-		var currMeta = {
-			grade: $(miscMetaData).find('grade').text(),
-			strokeCount: $(miscMetaData).find('stroke_count').text(),
-			frequency: $(miscMetaData).find('freq').text(),
-			radicalNames: [],
-			jlpt: $(miscMetaData).find('jlpt').text()
-		};
-		var radNames = $(miscMetaData).find('rad_name')
-		radNames.each(function(index, el) {
-			currMeta.radicalNames.push($(el).text());
-		});
-
-		currChar.miscMetaData = currMeta;
-
-		extractedChars.push(currChar);
-	});
-
-	return extractedChars;
 };
 
 KanjiPairs.prototype.indexReadings = function(characterReadings) {
@@ -225,7 +173,7 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 		shadow: this.cardShadow
 	});
 
-	var kanjiCharacter = this.readings[kanjiItem.kanjiIndex];
+	var kanjiCharacter = this.kanjiData[kanjiItem.kanjiIndex];
 	var kanjiTextObject = this.pairsCanvas.display.text(
 		$.extend({text: kanjiCharacter.literal}, this.kanjiTextProps)
 	);
@@ -323,8 +271,6 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 }
 
 $(document).ready(function() {
-	var kanjiData = $.parseXML($('#kanjidata').text());
-
 	kanjiPairs = new KanjiPairs(kanjiData, 'kanjipairs-main-canvas');
 
 	kanjiPairs.layoutCards(44);
