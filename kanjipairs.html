@@ -17,8 +17,49 @@
 			<script type="text/javascript" src="kanjidata.js"></script>
 		</div>
 
-		<div class="side-control" id="side-control-accordion">
-
+		<div class="side-control">
+			<div class="filter-header">Check one or more grades to filter the next set by. <br /> If none are checked, no filtering will be done.</div>
+			<div class="multiselect-wrapper" kanjipairs-control="grade-level-filter">
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-1" name="grade-level" value="1" /> <label for="grade-level-1">First Grade (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-2" name="grade-level" value="2" /> <label for="grade-level-2">Second Grade (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-3" name="grade-level" value="3" /> <label for="grade-level-3">Third Grade (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-4" name="grade-level" value="4" /> <label for="grade-level-4">Fourth Grade (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-5" name="grade-level" value="5" /> <label for="grade-level-5">Fifth Grade (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-6" name="grade-level" value="6" /> <label for="grade-level-6">Sixth Grade (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-8" name="grade-level" value="8" /> <label for="grade-level-8">Junior High/Middle School (Jouyou Kanji)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-9" name="grade-level" value="9" /> <label for="grade-level-9">For use in names (Jinmeiyou Kanji - Set 1)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-10" name="grade-level" value="10" /> <label for="grade-level-10">For use in names (Jinmeiyou Kanji - Set 2)</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="grade-level-0" name="grade-level" value="0" /> <label for="grade-level-0">Grade Not Specified</label>
+				</div>
+			</div>
+			<div>
+				<input type="button" value="New Set" kanjipairs-control="new-set-button" />
+			</div>
+		</div>
+		<div class="side-control">
+			<div kanjipairs-control="jlpt-filter"></div>
+		</div>
+		<div class="side-control">
+			<div kanjipairs-control="stroke-count-filter"></div>
 		</div>
 
 		<div id="bottom-controls">
@@ -33,15 +74,20 @@
 			</div>
 			<div class="bottom-control">
 				<div>
-					<input type="button" id="new-set" value="New Set" kanjipairs-control="new-set-button" />
+					<input type="button" value="New Set" kanjipairs-control="new-set-button" />
 				</div>
 			</div>
 		</div>
 
 		<div id="footer">
-			The data used for this game comes from the <a href="http://www.csse.monash.edu.au/~jwb/kanjidic2/">KANJIDIC2 project</a>
-			and is Copyright the <a href="http://www.edrdg.org/edrdg/licence.html">Electronic Dictionary Research and Development Group</a>.
-			It is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike License (V3.0)</a>.
+			<p>
+				The data used for this game comes from the <a href="http://www.csse.monash.edu.au/~jwb/kanjidic2/">KANJIDIC2 project</a>
+				and is Copyright the <a href="http://www.edrdg.org/edrdg/licence.html">Electronic Dictionary Research and Development Group</a>.
+				It is licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike License (V3.0)</a>.
+			</p>
+			<p>
+				Game created by Kanmuri with <a href="https://github.com/Kanmuri/kanjipairs_html">full source</a> available under the GNU Affero GPL3.
+			</p>
 		</div>
 	</body>
 </html>

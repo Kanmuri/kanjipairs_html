@@ -3,7 +3,7 @@
 }
 
 .side-control {
-	float: right;
+	float: left;
 }
 
 .bottom-control {
@@ -12,6 +12,14 @@
 
 #bottom-controls {
 	clear: both;
+}
+
+.filter-header {
+	font-weight: bold;
+}
+
+.checkbox-wrapper input:checked+label {
+	color: blue;
 }
 
 #timeout-slider {
@@ -34,7 +42,7 @@
 	padding-left: 10px;
 }
 
-#new-set {
+[kanjipairs-control=new-set-button] {
 	font-size: 20pt;
 	margin-top: 25px;
 	margin-left: 15px;

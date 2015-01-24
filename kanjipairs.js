@@ -59,6 +59,38 @@ KanjiPairs.prototype.initializeDataSet = function(kanjiSet) {
 	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
 }
 
+KanjiPairs.prototype.getFilters = function() {
+	var checkedLevels = $('[kanjipairs-control=grade-level-filter] input:checked');
+	var returnVals = {};
+	returnVals.gradeLevelFilter = [];
+
+	checkedLevels.each(function(index, el) {
+		returnVals.gradeLevelFilter.push($(el).val());
+	});
+
+	return returnVals;
+}
+
+KanjiPairs.prototype.filterKanjiSet = function() {
+	var filterSet = this.getFilters();
+
+	var filteredKanjiSet = [];
+
+	if(filterSet.gradeLevelFilter.length) {
+		$.each(this.baseKanjiData, function(index, val) {
+			var currGrade = ($.isNumeric(val.miscMetaData.grade) ? val.miscMetaData.grade : 0);
+			if($.inArray(currGrade.toString(), filterSet.gradeLevelFilter) !== -1) {
+				filteredKanjiSet.push(val);
+			}
+		});
+	}
+	else {
+		filteredKanjiSet = this.baseKanjiData;
+	}
+
+	this.initializeDataSet(filteredKanjiSet);
+}
+
 KanjiPairs.prototype.indexReadings = function(characterReadings) {
 	var indexedReadings = {};
 	$.each(characterReadings, function(index, currChar) {
@@ -110,6 +142,9 @@ KanjiPairs.prototype.pickRandomReadings = function(indexedReadings, numberOfRead
 }
 
 KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
+	//Can't produce more kanji than we have in our (possibly filtered) set
+	numberOfKanji = (numberOfKanji > this.kanjiData.length ? this.kanjiData.length : numberOfKanji);
+
 	//Force number of kanji to be an integer
 	numberOfKanji = numberOfKanji << 0;
 
@@ -122,6 +157,11 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 	//Number of kanji must be at least 2
 	if(numberOfKanji < 2) {
 		numberOfKanji = 2;
+	}
+
+	//sanity check, for when we have an empty filtered set or a filtered set with only one kanji
+	if(numberOfKanji > this.kanjiData.length) {
+		return; //exit the function w/o creating any kanji
 	}
 
 	//Grab enough readings for half the number of kanji (as each pair of kanji must share a reading)
@@ -331,6 +371,7 @@ KanjiPairs.prototype.initializeControls = function() {
 
 KanjiPairs.prototype.newCardSet = function() {
 	this.clearAllCards();
+	this.filterKanjiSet();
 	this.layoutCards(this.numberOfCards);
 }
 
