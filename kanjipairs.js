@@ -1,4 +1,4 @@
-KanjiPairs = function(kanjiData, canvasId) {
+KanjiPairs = function(kanjiData, canvasId, timeoutSliderId, timeoutSliderDisplayId) {
 	var that = this;
 	//presets
 	this.cardWidth = 100;
@@ -28,11 +28,26 @@ KanjiPairs = function(kanjiData, canvasId) {
 		background: 'white'
 	});
 
+	this.timeoutSliderSettings = {
+		range: "min",
+		min: 1,
+		max: 10,
+		value: 2,
+		step: 0.5
+	};
+
+	this.timeoutSliderId = timeoutSliderId;
+	this.timeoutSliderDisplayId = timeoutSliderDisplayId;
+
+	this.flipBackTimeout = 2;
+
 	this.kanjiData = kanjiData;
 	this.indexedReadings = this.indexReadings(this.kanjiData);
 	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
 
 	this.flippedCards = [];
+
+	this.initializeTimeoutSlider(this.timeoutSliderId, this.timeoutSliderDisplayId, this.timeoutSliderSettings);
 };
 
 KanjiPairs.prototype.indexReadings = function(characterReadings) {
@@ -210,7 +225,7 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 								firstCard.flipped = false;
 								kanjiPairsObj.toggleCard(secondCard, 'unflipped');
 								secondCard.flipped = false;
-							}, 1500);
+							}, kanjiPairsObj.flipBackTimeout * 1000);
 						})(that.flippedCards[0], this, that);
 					}
 					while(that.flippedCards.length) {
@@ -270,8 +285,23 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 	this.pairsCanvas.redraw();
 }
 
+KanjiPairs.prototype.initializeTimeoutSlider = function(sliderId, displayInputId, timeoutSliderSettings) {
+	var that = this;
+
+	var newSliderSettings = 
+		$.extend({
+			slide: function(event, ui) {
+				$('#' + displayInputId).val(ui.value);
+				that.flipBackTimeout = ui.value;
+			}
+		}, timeoutSliderSettings);
+
+	$('#' + sliderId).slider(newSliderSettings);
+	$('#' + displayInputId).val($('#' + sliderId).slider("value"));
+}
+
 $(document).ready(function() {
-	kanjiPairs = new KanjiPairs(kanjiData, 'kanjipairs-main-canvas');
+	kanjiPairs = new KanjiPairs(kanjiData, 'kanjipairs-main-canvas', 'timeout-slider', 'flip-back-timeout-seconds');
 
 	kanjiPairs.layoutCards(44);
 });

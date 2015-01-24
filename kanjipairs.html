@@ -2,17 +2,31 @@
 <html>
 	<head>
 		<title>KanjiPairs matching game</title>
-		<meta charset="utf-8"> 
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="kanjipairs.css">
+		<link rel="stylesheet" type="text/css" href="jquery-ui-1.11.2.custom/jquery-ui.css">
 	</head>
 	<body>
-		<div id="game_div">
+		<div id="gameplay-area">
 			<canvas id="kanjipairs-main-canvas" width="1280" height="720"></canvas>
 
-			<script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.js"></script>
-			<script type="text/javascript" src="ocanvas-2.7.3/ocanvas-2.7.3.js"></script>
+			<script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
+			<script type="text/javascript" src="jquery-ui-1.11.2.custom/jquery-ui.min.js"></script>
+			<script type="text/javascript" src="ocanvas-2.7.3/ocanvas-2.7.3.min.js"></script>
 			<script type="text/javascript" src="kanjipairs.js"></script>
 			<script type="text/javascript" src="kanjidata.js"></script>
 		</div>
+
+		<div class="bottom-control">
+			<div class="horizontal-slider-display">
+				<label for="flip-back-timeout-seconds">Mismatch hide timeout (seconds):</label>
+				<input type="text" id="flip-back-timeout-seconds" readonly />
+				<div class="slider-wrapper">
+					<div id="timeout-slider"></div>
+				</div>
+			</div>
+		</div>
+
 
 		<div id="footer">
 			The data used for this game comes from the <a href="http://www.csse.monash.edu.au/~jwb/kanjidic2/">KANJIDIC2 project</a>
