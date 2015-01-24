@@ -32,7 +32,7 @@ KanjiPairs = function(kanjiData, canvasId, timeoutSliderId, timeoutSliderDisplay
 		range: "min",
 		min: 1,
 		max: 10,
-		value: 2,
+		value: this.getSetting('flipBackTimeout') || 2,
 		step: 0.5
 	};
 
@@ -293,11 +293,36 @@ KanjiPairs.prototype.initializeTimeoutSlider = function(sliderId, displayInputId
 			slide: function(event, ui) {
 				$('#' + displayInputId).val(ui.value);
 				that.flipBackTimeout = ui.value;
+				that.saveSetting('flipBackTimeout', ui.value);
 			}
 		}, timeoutSliderSettings);
 
 	$('#' + sliderId).slider(newSliderSettings);
 	$('#' + displayInputId).val($('#' + sliderId).slider("value"));
+}
+
+KanjiPairs.prototype.localStorageSupported = function() {
+	try {
+		return('localStorage' in window && window['localStorage'] !== null);
+	}
+	catch(e) {
+		return false;
+	}
+}
+
+KanjiPairs.prototype.saveSetting = function(settingName, settingValue) {
+	if(this.localStorageSupported()) {
+		return localStorage.setItem(settingName, settingValue);
+	}
+}
+
+KanjiPairs.prototype.getSetting = function(settingName) {
+	if(this.localStorageSupported()) {
+		return localStorage.getItem(settingName);
+	}
+	else {
+		return undefined;
+	}
 }
 
 $(document).ready(function() {
