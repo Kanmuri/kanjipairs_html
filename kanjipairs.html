@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="gameplay-area">
-			<canvas id="kanjipairs-main-canvas" width="1280" height="720"></canvas>
+			<canvas id="kanjipairs-main-canvas" width="1280" height="720" kanjipairs-control="main-canvas"></canvas>
 
 			<script type="text/javascript" src="jquery-1.11.2/jquery-1.11.2.min.js"></script>
 			<script type="text/javascript" src="jquery-ui-1.11.2.custom/jquery-ui.min.js"></script>
@@ -17,16 +17,26 @@
 			<script type="text/javascript" src="kanjidata.js"></script>
 		</div>
 
-		<div class="bottom-control">
-			<div class="horizontal-slider-display">
-				<label for="flip-back-timeout-seconds">Mismatch hide timeout (seconds):</label>
-				<input type="text" id="flip-back-timeout-seconds" readonly />
-				<div class="slider-wrapper">
-					<div id="timeout-slider"></div>
+		<div class="side-control" id="side-control-accordion">
+
+		</div>
+
+		<div id="bottom-controls">
+			<div class="bottom-control">
+				<div class="horizontal-slider-display">
+					<label for="flip-back-timeout-seconds">Mismatch hide timeout (seconds):</label>
+					<input type="text" id="flip-back-timeout-seconds" readonly kanjipairs-control="timeout-slider-display" />
+					<div class="slider-wrapper">
+						<div id="timeout-slider" kanjipairs-control="timeout-slider"></div>
+					</div>
+				</div>
+			</div>
+			<div class="bottom-control">
+				<div>
+					<input type="button" id="new-set" value="New Set" kanjipairs-control="new-set-button" />
 				</div>
 			</div>
 		</div>
-
 
 		<div id="footer">
 			The data used for this game comes from the <a href="http://www.csse.monash.edu.au/~jwb/kanjidic2/">KANJIDIC2 project</a>

@@ -7,6 +7,10 @@
 }
 
 .bottom-control {
+	float: left;
+}
+
+#bottom-controls {
 	clear: both;
 }
 
@@ -16,6 +20,7 @@
 
 #flip-back-timeout-seconds {
 	border: 0px;
+	width: 40px;
 }
 
 .horizontal-slider-display, #flip-back-timeout-seconds {
@@ -27,6 +32,14 @@
 	padding-top: 10px;
 	padding-bottom: 10px;
 	padding-left: 10px;
+}
+
+#new-set {
+	font-size: 20pt;
+	margin-top: 25px;
+	margin-left: 15px;
+	background-color: blue;
+	color: white;
 }
 
 #footer {

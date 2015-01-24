@@ -1,5 +1,7 @@
-KanjiPairs = function(kanjiData, canvasId, timeoutSliderId, timeoutSliderDisplayId) {
+KanjiPairs = function(kanjiData, numberOfCards) {
 	var that = this;
+	this.numberOfCards = numberOfCards;
+
 	//presets
 	this.cardWidth = 100;
 	this.cardHeight = 135;
@@ -22,11 +24,8 @@ KanjiPairs = function(kanjiData, canvasId, timeoutSliderId, timeoutSliderDisplay
 		fill: 'white',
 	};
 
-	this.canvasId = canvasId;
-	this.pairsCanvas = oCanvas.create({
-		canvas: '#' + canvasId,
-		background: 'white'
-	});
+	this.canvasId = $('[kanjipairs-control=main-canvas]').prop('id');
+	this.pairsCanvas = this.initializeCanvas();
 
 	this.timeoutSliderSettings = {
 		range: "min",
@@ -36,19 +35,29 @@ KanjiPairs = function(kanjiData, canvasId, timeoutSliderId, timeoutSliderDisplay
 		step: 0.5
 	};
 
-	this.timeoutSliderId = timeoutSliderId;
-	this.timeoutSliderDisplayId = timeoutSliderDisplayId;
-
 	this.flipBackTimeout = 2;
 
-	this.kanjiData = kanjiData;
-	this.indexedReadings = this.indexReadings(this.kanjiData);
-	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
+	this.baseKanjiData = kanjiData;
+
+	this.initializeDataSet(this.baseKanjiData);
 
 	this.flippedCards = [];
 
-	this.initializeTimeoutSlider(this.timeoutSliderId, this.timeoutSliderDisplayId, this.timeoutSliderSettings);
+	this.initializeControls();
 };
+
+KanjiPairs.prototype.initializeCanvas = function(canvasId) {
+	return oCanvas.create({
+		canvas: '#' + this.canvasId,
+		background: 'white'
+	});
+}
+
+KanjiPairs.prototype.initializeDataSet = function(kanjiSet) {
+	this.kanjiData = kanjiSet;
+	this.indexedReadings = this.indexReadings(this.kanjiData);
+	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
+}
 
 KanjiPairs.prototype.indexReadings = function(characterReadings) {
 	var indexedReadings = {};
@@ -285,20 +294,41 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 	this.pairsCanvas.redraw();
 }
 
-KanjiPairs.prototype.initializeTimeoutSlider = function(sliderId, displayInputId, timeoutSliderSettings) {
+KanjiPairs.prototype.clearAllCards = function() {
+	this.pairsCanvas.destroy();
+	this.pairsCanvas = this.initializeCanvas(this.canvasId);
+}
+
+KanjiPairs.prototype.initializeTimeoutSlider = function(timeoutSliderSettings) {
 	var that = this;
+	var displayInputSelector = '[kanjipairs-control=timeout-slider-display]';
+	var sliderSelector = '[kanjipairs-control=timeout-slider]';
 
 	var newSliderSettings = 
 		$.extend({
 			slide: function(event, ui) {
-				$('#' + displayInputId).val(ui.value);
+				$(displayInputSelector).val(ui.value);
 				that.flipBackTimeout = ui.value;
 				that.saveSetting('flipBackTimeout', ui.value);
 			}
 		}, timeoutSliderSettings);
 
-	$('#' + sliderId).slider(newSliderSettings);
-	$('#' + displayInputId).val($('#' + sliderId).slider("value"));
+	$(sliderSelector).slider(newSliderSettings);
+	$(displayInputSelector).val($(sliderSelector).slider("value"));
+}
+
+KanjiPairs.prototype.initializeControls = function() {
+	var that = this;
+	this.initializeTimeoutSlider(this.timeoutSliderSettings);
+
+	$('[kanjipairs-control=new-set-button]').click(function(event) {
+		that.newCardSet();
+	});
+}
+
+KanjiPairs.prototype.newCardSet = function() {
+	this.clearAllCards();
+	this.layoutCards(this.numberOfCards);
 }
 
 KanjiPairs.prototype.localStorageSupported = function() {
@@ -326,7 +356,7 @@ KanjiPairs.prototype.getSetting = function(settingName) {
 }
 
 $(document).ready(function() {
-	kanjiPairs = new KanjiPairs(kanjiData, 'kanjipairs-main-canvas', 'timeout-slider', 'flip-back-timeout-seconds');
+	kanjiPairs = new KanjiPairs(kanjiData, 44);
 
-	kanjiPairs.layoutCards(44);
+	kanjiPairs.newCardSet();
 });
