@@ -295,6 +295,9 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 }
 
 KanjiPairs.prototype.clearAllCards = function() {
+	while(this.flippedCards.length) {
+		this.flippedCards.pop();
+	}
 	this.pairsCanvas.destroy();
 	this.pairsCanvas = this.initializeCanvas(this.canvasId);
 }
