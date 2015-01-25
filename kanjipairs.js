@@ -37,6 +37,11 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 
 	this.flipBackTimeout = 2;
 
+	this.filtersList = [
+		'grade-level-filter',
+		'jlpt-filter'
+	];
+
 	this.baseKanjiData = kanjiData;
 
 	this.initializeDataSet(this.baseKanjiData);
@@ -59,12 +64,36 @@ KanjiPairs.prototype.initializeDataSet = function(kanjiSet) {
 	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
 }
 
+KanjiPairs.prototype.loadFilterSettings = function(controlName) {
+	var filterSettingsString = this.getSetting(controlName);
+	if(typeof filterSettingsString !== 'undefined') {
+		var filterSettings = JSON.parse(filterSettingsString);
+		var filterItems = $('[kanjipairs-control=' + controlName + '] input');
+		filterItems.each(function(index, el) {
+			if($.inArray($(el).val(), filterSettings) !== -1) {
+				$(el).prop('checked', true);
+			}
+		});
+	}
+}
+
+KanjiPairs.prototype.saveFilterSettings = function(controlName) {
+	if(this.localStorageSupported()) {
+		var filterSettings = this.getFilters();
+		if(filterSettings.hasOwnProperty(controlName)) {
+			var filterSettingsString = JSON.stringify(filterSettings[controlName]);
+			this.saveSetting(controlName, filterSettingsString);
+		}
+	}
+}
+
 KanjiPairs.prototype.getFilters = function() {
+	var that = this;
 	var returnVals = {};
 
-	returnVals.gradeLevelFilter = this.grabCheckListFilterVals('grade-level-filter');
-	
-	returnVals.jlptFilter = this.grabCheckListFilterVals('jlpt-filter');
+	$.each(this.filtersList, function(index, filterName) {
+		returnVals[filterName] = that.grabCheckListFilterVals(filterName);
+	});
 
 	return returnVals;
 }
@@ -95,14 +124,14 @@ KanjiPairs.prototype.filterKanjiSet = function() {
 		$.each(this.baseKanjiData, function(index, kanjiCharacter) {
 			var charIncluded = true;
 
-			if(filterSet.gradeLevelFilter.length) {
+			if(filterSet['grade-level-filter'].length) {
 				var currGrade = ($.isNumeric(kanjiCharacter.miscMetaData.grade) ? kanjiCharacter.miscMetaData.grade : 0);
-				charIncluded = charIncluded && ($.inArray(currGrade.toString(), filterSet.gradeLevelFilter) !== -1);
+				charIncluded = charIncluded && ($.inArray(currGrade.toString(), filterSet['grade-level-filter']) !== -1);
 			}
 
-			if(filterSet.jlptFilter.length) {
+			if(filterSet['jlpt-filter'].length) {
 				var currJlptLevel = ($.isNumeric(kanjiCharacter.miscMetaData.jlpt) ? kanjiCharacter.miscMetaData.jlpt : 0);
-				charIncluded = charIncluded && ($.inArray(currJlptLevel.toString(), filterSet.jlptFilter) !== -1);
+				charIncluded = charIncluded && ($.inArray(currJlptLevel.toString(), filterSet['jlpt-filter']) !== -1);
 			}
 
 			if(charIncluded) {
@@ -392,7 +421,15 @@ KanjiPairs.prototype.initializeControls = function() {
 
 	$('[kanjipairs-control=new-set-button]').click(function(event) {
 		that.newCardSet();
+		$.each(that.filtersList, function(index, filterName) {
+			that.saveFilterSettings(filterName);
+		});
 	});
+
+	$.each(this.filtersList, function(index, filterName) {
+		that.loadFilterSettings(filterName);
+	});
+
 }
 
 KanjiPairs.prototype.newCardSet = function() {
