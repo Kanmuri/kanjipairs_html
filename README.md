@@ -17,6 +17,4 @@ The version I am using is also available in the kanjidic2 directory/folder.
   2. If the readings of those two cards don't match, then the cards are flipped over after a small delay
 
 # TODO
-* Provide options to filter the random set, possible ideas include:
-  1. 常用漢字 (Jouyou Kanji) -- Only show kanji in the "common use" set
-  2. Filter by other metadata that's in the KANJIDIC2 file
+* More filters?

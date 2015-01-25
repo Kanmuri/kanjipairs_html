@@ -60,12 +60,20 @@ KanjiPairs.prototype.initializeDataSet = function(kanjiSet) {
 }
 
 KanjiPairs.prototype.getFilters = function() {
-	var checkedLevels = $('[kanjipairs-control=grade-level-filter] input:checked');
 	var returnVals = {};
-	returnVals.gradeLevelFilter = [];
 
-	checkedLevels.each(function(index, el) {
-		returnVals.gradeLevelFilter.push($(el).val());
+	returnVals.gradeLevelFilter = this.grabCheckListFilterVals('grade-level-filter');
+	
+	returnVals.jlptFilter = this.grabCheckListFilterVals('jlpt-filter');
+
+	return returnVals;
+}
+
+KanjiPairs.prototype.grabCheckListFilterVals = function(controlName) {
+	var returnVals = [];
+	var checkedItems = $('[kanjipairs-control=' + controlName + '] input:checked');
+	checkedItems.each(function(index, el) {
+		returnVals.push($(el).val());
 	});
 
 	return returnVals;
@@ -73,14 +81,32 @@ KanjiPairs.prototype.getFilters = function() {
 
 KanjiPairs.prototype.filterKanjiSet = function() {
 	var filterSet = this.getFilters();
-
 	var filteredKanjiSet = [];
 
-	if(filterSet.gradeLevelFilter.length) {
-		$.each(this.baseKanjiData, function(index, val) {
-			var currGrade = ($.isNumeric(val.miscMetaData.grade) ? val.miscMetaData.grade : 0);
-			if($.inArray(currGrade.toString(), filterSet.gradeLevelFilter) !== -1) {
-				filteredKanjiSet.push(val);
+	var hasFilters = false;
+	$.each(filterSet, function(index, val) {
+		hasFilters = hasFilters || val.length;
+		if(hasFilters) {
+			return false; //break out of the loop
+		}
+	});
+
+	if(hasFilters) {
+		$.each(this.baseKanjiData, function(index, kanjiCharacter) {
+			var charIncluded = true;
+
+			if(filterSet.gradeLevelFilter.length) {
+				var currGrade = ($.isNumeric(kanjiCharacter.miscMetaData.grade) ? kanjiCharacter.miscMetaData.grade : 0);
+				charIncluded = charIncluded && ($.inArray(currGrade.toString(), filterSet.gradeLevelFilter) !== -1);
+			}
+
+			if(filterSet.jlptFilter.length) {
+				var currJlptLevel = ($.isNumeric(kanjiCharacter.miscMetaData.jlpt) ? kanjiCharacter.miscMetaData.jlpt : 0);
+				charIncluded = charIncluded && ($.inArray(currJlptLevel.toString(), filterSet.jlptFilter) !== -1);
+			}
+
+			if(charIncluded) {
+				filteredKanjiSet.push(kanjiCharacter);
 			}
 		});
 	}

@@ -18,7 +18,21 @@
 		</div>
 
 		<div class="side-control">
-			<div class="filter-header">Check one or more grades to filter the next set by. <br /> If none are checked, no filtering will be done.</div>
+			<div class="filter-header">
+				These filters are not mutually exclusive. <br />
+				It's possible to select a filter set that has no kanji <br />
+				If you get no cards after hitting "New Set", try different filters. <br />
+				<br />
+			</div>
+		</div>
+
+		<div class="side-control">
+			<div class="filter-header">
+				Check one or more grades to filter the next set by. <br /> 
+				These are (mostly) the grade/year in school in which <br />
+				the kanji is taught in the Japanese educational system. <br />
+				If none are checked, no filtering by grade level will be done.
+			</div>
 			<div class="multiselect-wrapper" kanjipairs-control="grade-level-filter">
 				<div class="checkbox-wrapper">
 					<input type="checkbox" id="grade-level-1" name="grade-level" value="1" /> <label for="grade-level-1">First Grade (Jouyou Kanji)</label>
@@ -56,7 +70,31 @@
 			</div>
 		</div>
 		<div class="side-control">
-			<div kanjipairs-control="jlpt-filter"></div>
+			<div class="filter-header">
+				Check one or more JLPT levels to filter the next set by. <br />
+				These are the original JLPT levels, not the new "N" levels. <br />
+				There are no publicly available official lists of kanji for <br />
+				the new levels. (At least not at the time this dataset was <br />
+				created.) <br />
+				If none are checked, no filtering by JLPT level will be done. <br />
+			</div>
+			<div class="multiselect-wrapper" kanjipairs-control="jlpt-filter">
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="jlpt-level-1" name="jlpt-level" value="1" /> <label for="jlpt-level-1">JPLT Level 1</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="jlpt-level-2" name="jlpt-level" value="2" /> <label for="jlpt-level-2">JLPT Level 2</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="jlpt-level-3" name="jlpt-level" value="3" /> <label for="jlpt-level-3">JLPT Level 3</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="jlpt-level-4" name="jlpt-level" value="4" /> <label for="jlpt-level-4">JLPT Level 4</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="checkbox" id="jlpt-level-0" name="jlpt-level" value="0" /> <label for="jlpt-level-0">JLPT Level Not Specified</label>
+				</div>
+			</div>
 		</div>
 		<div class="side-control">
 			<div kanjipairs-control="stroke-count-filter"></div>
