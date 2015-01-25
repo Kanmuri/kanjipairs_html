@@ -7,6 +7,7 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 	this.cardHeight = 135;
 	this.cardSpacing = 10;
 	this.cardFill = 'blue';
+	this.matchedCardFill = 'black';
 	this.cardStroke = 'outside 1px black';
 	this.cardShadow = '5px 5px 10px gray';
 
@@ -319,7 +320,9 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 					if(that.flippedCards[0].kanjiItem.selectedReading == this.kanjiItem.selectedReading) {
 						that.flippedCards[0].unbind('click tap', that.flippedCards[0].clickHandler);
 						this.unbind('click tap', this.clickHandler);
+						that.flippedCards[0].fill = that.matchedCardFill;
 						that.toggleCard(that.flippedCards[0], 'both');
+						this.fill = that.matchedCardFill;
 						that.toggleCard(this, 'both');
 					}
 					else {
