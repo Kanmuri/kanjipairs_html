@@ -28,15 +28,16 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 	this.canvasId = $('[kanjipairs-control=main-canvas]').prop('id');
 	this.pairsCanvas = this.initializeCanvas();
 
+	this.flipBackTimeout = this.getSetting('flipBackTimeout') || 2;
+
 	this.timeoutSliderSettings = {
 		range: "min",
 		min: 1,
 		max: 10,
-		value: this.getSetting('flipBackTimeout') || 2,
+		value: this.flipBackTimeout,
 		step: 0.5
 	};
 
-	this.flipBackTimeout = 2;
 
 	this.filtersList = [
 		'grade-level-filter',
