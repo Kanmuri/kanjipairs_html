@@ -38,10 +38,13 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 		step: 0.5
 	};
 
+	this.autoShuffleControlName = 'auto-shuffle-selection';
+	this.autoShuffleControlSelector = '[kanjipairs-control=' + this.autoShuffleControlName + ']';
 
 	this.filtersList = [
 		'grade-level-filter',
-		'jlpt-filter'
+		'jlpt-filter',
+		this.autoShuffleControlName
 	];
 
 	this.baseKanjiData = kanjiData;
@@ -325,6 +328,12 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 						that.toggleCard(that.flippedCards[0], 'both');
 						this.fill = that.matchedCardFill;
 						that.toggleCard(this, 'both');
+						this.matchedCard = true;
+						that.flippedCards[0].matchedCard = true;
+						var autoShuffleSetting = $(that.autoShuffleControlSelector).find('input:checked');
+						if(autoShuffleSetting.length && autoShuffleSetting.val() == 'attempt') {
+							that.shuffleCards();
+						}
 					}
 					else {
 						(function(firstCard, secondCard, kanjiPairsObj){
@@ -333,6 +342,10 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 								firstCard.flipped = false;
 								kanjiPairsObj.toggleCard(secondCard, 'unflipped');
 								secondCard.flipped = false;
+								var autoShuffleSetting = $(that.autoShuffleControlSelector).find('input:checked');
+								if(autoShuffleSetting.length && autoShuffleSetting.val() == 'attempt') {
+									that.shuffleCards();
+								}
 							}, kanjiPairsObj.flipBackTimeout * 1000);
 						})(that.flippedCards[0], this, that);
 					}
@@ -393,6 +406,63 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 	this.pairsCanvas.redraw();
 }
 
+KanjiPairs.prototype.shuffleCards = function() {
+	var that = this;
+
+	//make a copy of the children array to iterate over
+	var cardsArray = that.pairsCanvas.children.slice(0);
+
+	var canvasElement = $('#' + this.canvasId);
+	var canvasWidth = canvasElement.width();
+	var canvasHeight = canvasElement.height();
+
+	var shuffledArray = that.shuffleArray(cardsArray);
+
+	$.each(cardsArray, function(index, currCard) {
+		currCard.remove(false);
+	});
+
+	that.pairsCanvas.redraw();
+
+	var xPos = 0;
+	var yPos = 0;
+
+	$.each(shuffledArray, function(index, currCard) {
+		currCard.x = xPos;
+		currCard.y = yPos;
+		that.pairsCanvas.addChild(currCard, false);
+
+		xPos += that.cardWidth + that.cardSpacing;
+		if((xPos + that.cardWidth) > canvasWidth) {
+			yPos += that.cardHeight + that.cardSpacing;
+			xPos = 0;
+		}
+	});
+
+	//If there are any flipped cards, make sure they display as flipped after the shuffle
+	$.each(that.flippedCards, function(index, currCard) {
+		//except if it has already been matched
+		if(!currCard.hasOwnProperty('matchedCard') && currCard.matchedCard) {
+			that.toggleCard(currCard, 'flipped');
+		}
+	});
+
+	that.pairsCanvas.redraw();
+}
+
+KanjiPairs.prototype.shuffleArray = function(arrayToShuffle) {
+	var shuffledArray = arrayToShuffle.slice(0);
+	for (var currIndex = shuffledArray.length - 1; currIndex > 0; currIndex--) {
+		//The bit shift (<<) is shorthand that truncates the value to an integer value
+		var swapIndex = Math.floor(Math.random() * (currIndex + 1));
+
+		var temp = shuffledArray[currIndex];
+		shuffledArray[currIndex] = shuffledArray[swapIndex];
+		shuffledArray[swapIndex] = temp;
+	}
+	return shuffledArray;
+}
+
 KanjiPairs.prototype.clearAllCards = function() {
 	while(this.flippedCards.length) {
 		this.flippedCards.pop();
@@ -430,10 +500,23 @@ KanjiPairs.prototype.initializeControls = function() {
 		});
 	});
 
+	$('[kanjipairs-control=shuffle-button]').click(function(event) {
+		that.shuffleCards();
+	});
+
 	$.each(this.filtersList, function(index, filterName) {
 		that.loadFilterSettings(filterName);
 	});
 
+	var autoShuffleControl = $(this.autoShuffleControlSelector);
+
+	autoShuffleControl.change(function(event) {
+		that.saveFilterSettings(that.autoShuffleControlName);
+	});
+
+	if(!autoShuffleControl.find('input:checked').length) {
+		autoShuffleControl.find('input[value=off]').prop('checked', 'true');
+	}
 }
 
 KanjiPairs.prototype.newCardSet = function() {

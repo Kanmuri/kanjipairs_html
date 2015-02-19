@@ -67,7 +67,8 @@
 				</div>
 			</div>
 			<div>
-				<input type="button" value="New Set" kanjipairs-control="new-set-button" />
+				<input type="button" value="New Set" class="kanjipairs-button" kanjipairs-control="new-set-button" />
+				<input type="button" value="Shuffle" class="kanjipairs-button" kanjipairs-control="shuffle-button" />
 			</div>
 		</div>
 		<div class="side-control">
@@ -111,9 +112,21 @@
 					</div>
 				</div>
 			</div>
+			<div class="bottom-control" kanjipairs-control="auto-shuffle-selection">
+				<div class="control-header">
+					Auto-Shuffle settings
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="radio" id="auto-shuffle-off" name="auto-shuffle" value="off" /> <label for="auto-shuffle-off">Auto-shuffle off</label>
+				</div>
+				<div class="checkbox-wrapper">
+					<input type="radio" id="auto-shuffle-attempt" name="auto-shuffle" value="attempt" /> <label for="auto-shuffle-attempt">Shuffle after each match attempt</label>
+				</div>
+			</div>
 			<div class="bottom-control">
 				<div>
-					<input type="button" value="New Set" kanjipairs-control="new-set-button" />
+					<input type="button" value="New Set" class="kanjipairs-button" kanjipairs-control="new-set-button" />
+					<input type="button" value="Shuffle" class="kanjipairs-button" kanjipairs-control="shuffle-button" />
 				</div>
 			</div>
 		</div>

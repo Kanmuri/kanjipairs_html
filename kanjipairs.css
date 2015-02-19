@@ -14,7 +14,7 @@
 	clear: both;
 }
 
-.filter-header {
+.filter-header, .control-header {
 	font-weight: bold;
 }
 
@@ -42,7 +42,7 @@
 	padding-left: 10px;
 }
 
-[kanjipairs-control=new-set-button] {
+.kanjipairs-button {
 	font-size: 20pt;
 	margin-top: 25px;
 	margin-left: 15px;
