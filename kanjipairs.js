@@ -47,6 +47,8 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 		this.autoShuffleControlName
 	];
 
+	this.usedReadings = [];
+
 	this.baseKanjiData = kanjiData;
 
 	this.initializeDataSet(this.baseKanjiData);
@@ -180,28 +182,44 @@ KanjiPairs.prototype.pruneIndexedReadings = function(indexedReadings, minResults
 
 KanjiPairs.prototype.pickRandomReading = function(indexedReadings) {
 	var readingKeys = Object.keys(indexedReadings);
-	//The bit shift (<<) is shorthand that truncates the value to an integer value
-	var randomIndex = readingKeys[readingKeys.length * Math.random() << 0];
-	return randomIndex;
+
+	if(this.usedReadings.length >= readingKeys.length) {
+		return null;
+	}
+	else {
+		//The bit shift (<<) is shorthand that truncates the value to an integer value
+		var randomIndex = readingKeys[readingKeys.length * Math.random() << 0];
+		this.usedReadings.push(randomIndex);
+		return randomIndex;
+	}
 }
 
 KanjiPairs.prototype.pickRandomReadings = function(indexedReadings, numberOfReadings) {
 	var readingKeys = Object.keys(indexedReadings);
 	var readingPicks = [];
 
-	for(var i = 0; i < numberOfReadings;) {
-		//The bit shift (<<) is shorthand that truncates the value to an integer value
-		var randomIndex = readingKeys[readingKeys.length * Math.random() << 0];
-		if($.inArray(randomIndex, readingPicks) === -1) {
-			readingPicks.push(randomIndex);
-			i++;
+	if(numberOfReadings >= readingKeys.length) {
+		readingPicks = readingKeys;
+	}
+	else {
+		for(var i = 0; i < numberOfReadings;) {
+			//The bit shift (<<) is shorthand that truncates the value to an integer value
+			var randomIndex = readingKeys[readingKeys.length * Math.random() << 0];
+			if($.inArray(randomIndex, readingPicks) === -1) {
+				readingPicks.push(randomIndex);
+				this.usedReadings.push(randomIndex);
+				i++;
+			}
 		}
+
 	}
 
 	return readingPicks;
 }
 
 KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
+	var that = this;
+
 	//Can't produce more kanji than we have in our (possibly filtered) set
 	numberOfKanji = (numberOfKanji > this.kanjiData.length ? this.kanjiData.length : numberOfKanji);
 
@@ -232,8 +250,20 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 	for(var currentReadingIndex = 0; currentReadingIndex < numberOfKanji / 2;) {
 		//Get random kanji from this loop's reading
 		var currReading = randomReadings[currentReadingIndex];
-		var currReadingKanji = indexedReadings[currReading];
+		var currReadingKanjiFull = indexedReadings[currReading];
+
+		var numKanjiForReading = 0;
+		var currReadingKanji = [];
+
+		//Filter out kanji that have already been added
+		$.each(currReadingKanjiFull, function(index, currKanji) {
+			if(!that.checkForKanji(kanjiArray, currKanji)) {
+				currReadingKanji.push(currKanji);
+			}
+		});
+
 		var numKanjiForReading = currReadingKanji.length;
+
 		//Need to make sure there's at least two. Those with only one should have already been pruned off, but this is here just in case
 		if(numKanjiForReading >= 2) {
 			for(var numKanjiForPair = 0; numKanjiForPair < 2;) {
@@ -246,7 +276,7 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 				else {
 					var randomKanji = currReadingKanji[numKanjiForReading * Math.random() << 0];
 					var kanjiItem = {kanjiIndex: randomKanji, selectedReading: currReading};
-					var kanjiOkToAdd = (!this.checkForKanji(kanjiArray, kanjiItem));
+					var kanjiOkToAdd = (!this.checkForKanji(kanjiArray, randomKanji));
 				}
 
 
@@ -266,17 +296,24 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 		}
 		else {
 			//get a different random reading to replace this one
-			randomReadings[currentReadingIndex] = this.pickRandomReading(indexedReadings);
+			var newRandomReading = this.pickRandomReading(indexedReadings);
+			if(newRandomReading === null) {
+				//we ran out of readings
+				break;
+			}
+			else {
+				randomReadings[currentReadingIndex] = newRandomReading;
+			}
 		}
 	}
 
 	return kanjiArray;
 }
 
-KanjiPairs.prototype.checkForKanji = function(kanjiArray, kanjiItem) {
+KanjiPairs.prototype.checkForKanji = function(kanjiArray, kanjiIndex) {
 	var matchFound = false;
 	$.each(kanjiArray, function(index, val) {
-		if((typeof val !== 'undefined') && val.kanjiIndex == kanjiItem.kanjiIndex && val.selectedReading == kanjiItem.selectedReading) {
+		if((typeof val !== 'undefined') && val.kanjiIndex == kanjiIndex) {
 			matchFound = true;
 			return false; //return false breaks us out of the .each() loop
 		}
@@ -396,11 +433,14 @@ KanjiPairs.prototype.layoutCards = function(numberOfCards) {
 	var yPos = 0;
 
 	$.each(kanjiSet, function(index, currKanji) {
-		that.addCard(currKanji, xPos, yPos, true);
-		xPos += that.cardWidth + that.cardSpacing;
-		if((xPos + that.cardWidth) > canvasWidth) {
-			yPos += that.cardHeight + that.cardSpacing;
-			xPos = 0;
+		//If we ran out of readings/cards before the array was filled, there will be undefined elements
+		if(typeof currKanji !== 'undefined') {
+			that.addCard(currKanji, xPos, yPos, true);
+			xPos += that.cardWidth + that.cardSpacing;
+			if((xPos + that.cardWidth) > canvasWidth) {
+				yPos += that.cardHeight + that.cardSpacing;
+				xPos = 0;
+			}
 		}
 	});
 	this.pairsCanvas.redraw();
@@ -453,7 +493,6 @@ KanjiPairs.prototype.shuffleCards = function() {
 KanjiPairs.prototype.shuffleArray = function(arrayToShuffle) {
 	var shuffledArray = arrayToShuffle.slice(0);
 	for (var currIndex = shuffledArray.length - 1; currIndex > 0; currIndex--) {
-		//The bit shift (<<) is shorthand that truncates the value to an integer value
 		var swapIndex = Math.floor(Math.random() * (currIndex + 1));
 
 		var temp = shuffledArray[currIndex];
@@ -520,6 +559,7 @@ KanjiPairs.prototype.initializeControls = function() {
 }
 
 KanjiPairs.prototype.newCardSet = function() {
+	this.usedReadings.length = 0;
 	this.clearAllCards();
 	this.filterKanjiSet();
 	this.layoutCards(this.numberOfCards);
