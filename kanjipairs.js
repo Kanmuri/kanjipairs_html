@@ -6,7 +6,16 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 	this.cardWidth = 100;
 	this.cardHeight = 135;
 	this.cardSpacing = 10;
-	this.cardFill = 'blue';
+	this.cardFill = {red: 0, green: 0, blue: 255};
+	this.altCardFills = [
+		{red: 0, green: 160, blue: 255},
+		{red: 0, green: 224, blue: 255},
+		{red: 160, green: 0, blue: 255},
+		{red: 160, green: 160, blue: 255},
+		{red: 0, green: 160, blue: 0},
+		{red: 0, green: 224, blue: 0}
+	];
+	this.kanjiAlternateFills = {};
 	this.matchedCardFill = 'black';
 	this.cardStroke = 'outside 1px black';
 	this.cardShadow = '5px 5px 10px gray';
@@ -47,6 +56,9 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 		this.autoShuffleControlName
 	];
 
+	this.normalizeReadings = true;
+	this.preventDuplicates = true;
+
 	this.usedReadings = [];
 
 	this.baseKanjiData = kanjiData;
@@ -58,6 +70,26 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 	this.initializeControls();
 };
 
+KanjiPairs.prototype.katakanaToHiragana = function(stringWithKatakana) {
+	var hiraganaString = stringWithKatakana.replace(/[ァ-ン]/g, function(s) {
+		return String.fromCharCode(s.charCodeAt(0) - 0x60);
+	});
+
+	return hiraganaString;
+}
+
+KanjiPairs.prototype.hiraganaToKatakana = function(stringWithHiragana) {
+	var katakanaString = stringWithHiragana.replace(/[ぁ-ん]/g, function(s) {
+		return String.fromCharCode(s.charCodeAt(0) + 0x60);
+	});
+
+	return katakanaString;
+}
+
+KanjiPairs.prototype.normalizeReading = function(readingToNormalize) {
+	return this.katakanaToHiragana(readingToNormalize);
+}
+
 KanjiPairs.prototype.initializeCanvas = function(canvasId) {
 	return oCanvas.create({
 		canvas: '#' + this.canvasId,
@@ -67,7 +99,9 @@ KanjiPairs.prototype.initializeCanvas = function(canvasId) {
 
 KanjiPairs.prototype.initializeDataSet = function(kanjiSet) {
 	this.kanjiData = kanjiSet;
-	this.indexedReadings = this.indexReadings(this.kanjiData);
+	var indexResults = this.indexReadings(this.kanjiData);
+	this.indexedReadings = indexResults.indexedReadings;
+	this.readingNormalizations = indexResults.readingNormalizations;
 	this.prunedReadingIndex = this.pruneIndexedReadings(this.indexedReadings, 2);
 }
 
@@ -154,18 +188,31 @@ KanjiPairs.prototype.filterKanjiSet = function() {
 }
 
 KanjiPairs.prototype.indexReadings = function(characterReadings) {
+	var that = this;
 	var indexedReadings = {};
+	var readingNormalizations = {};
 	$.each(characterReadings, function(index, currChar) {
 		var characterIndex = index;
 		$.each(currChar.readings, function(index, currReading) {
-			if(!indexedReadings.hasOwnProperty(currReading.readingText)) {
-				indexedReadings[currReading.readingText] = [];
+			if(that.normalizeReadings) {
+				var normalizedReading = that.normalizeReading(currReading.readingText);
 			}
-			indexedReadings[currReading.readingText].push(characterIndex);
+			else {
+				var normalizedReading = currReading.readingText;
+			}
+			if(!indexedReadings.hasOwnProperty(normalizedReading)) {
+				indexedReadings[normalizedReading] = [];
+			}
+			indexedReadings[normalizedReading].push(characterIndex);
+			if(currReading.readingText != normalizedReading) {
+				//assigns readingNormalizations[characterIndex] to itself, if defined. Otherwise, sets it to a new object
+				readingNormalizations[characterIndex] = readingNormalizations[characterIndex] || {};
+				readingNormalizations[characterIndex][normalizedReading] = currReading.readingText;
+			}
 		});
 	});
 
-	return indexedReadings;
+	return {indexedReadings: indexedReadings, readingNormalizations: readingNormalizations};
 }
 
 KanjiPairs.prototype.pruneIndexedReadings = function(indexedReadings, minResults) {
@@ -255,12 +302,17 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 		var numKanjiForReading = 0;
 		var currReadingKanji = [];
 
-		//Filter out kanji that have already been added
-		$.each(currReadingKanjiFull, function(index, currKanji) {
-			if(!that.checkForKanji(kanjiArray, currKanji)) {
-				currReadingKanji.push(currKanji);
-			}
-		});
+		if(that.preventDuplicates) {
+			//Filter out kanji that have already been added
+			$.each(currReadingKanjiFull, function(index, currKanji) {
+				if(!that.checkForKanji(kanjiArray, {kanjiIndex: currKanji})) {
+					currReadingKanji.push(currKanji);
+				}
+			});
+		}
+		else {
+			currReadingKanji = currReadingKanjiFull;
+		}
 
 		var numKanjiForReading = currReadingKanji.length;
 
@@ -276,11 +328,15 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 				else {
 					var randomKanji = currReadingKanji[numKanjiForReading * Math.random() << 0];
 					var kanjiItem = {kanjiIndex: randomKanji, selectedReading: currReading};
-					var kanjiOkToAdd = (!this.checkForKanji(kanjiArray, randomKanji));
+					var kanjiOkToAdd = (!this.checkForKanji(kanjiArray, kanjiItem));
 				}
 
 
 				if(kanjiOkToAdd) {
+					if(this.readingNormalizations.hasOwnProperty(kanjiItem.kanjiIndex) && this.readingNormalizations[kanjiItem.kanjiIndex].hasOwnProperty(kanjiItem.selectedReading)) {
+						kanjiItem.selectedReading = this.readingNormalizations[kanjiItem.kanjiIndex][kanjiItem.selectedReading];
+					}
+
 					var foundOpenSpot = false;
 					while(!foundOpenSpot) {
 						var randomIndex = numberOfKanji * Math.random() << 0;
@@ -298,8 +354,8 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 			//get a different random reading to replace this one
 			var newRandomReading = this.pickRandomReading(indexedReadings);
 			if(newRandomReading === null) {
-				//we ran out of readings
-				break;
+				//we ran out of new readings, continue to the next reading
+				currentReadingIndex++;
 			}
 			else {
 				randomReadings[currentReadingIndex] = newRandomReading;
@@ -310,26 +366,57 @@ KanjiPairs.prototype.createKanjiSet = function(indexedReadings, numberOfKanji) {
 	return kanjiArray;
 }
 
-KanjiPairs.prototype.checkForKanji = function(kanjiArray, kanjiIndex) {
+KanjiPairs.prototype.checkForKanji = function(kanjiArray, kanjiItem) {
+	var that = this;
 	var matchFound = false;
-	$.each(kanjiArray, function(index, val) {
-		if((typeof val !== 'undefined') && val.kanjiIndex == kanjiIndex) {
-			matchFound = true;
-			return false; //return false breaks us out of the .each() loop
+	$.each(kanjiArray, function checkEachElementForKanji(index, val) {
+		if(typeof val !== 'undefined') {
+			var kanjiMatch = false;
+			if(that.preventDuplicates) {
+				kanjiMatch = (val.kanjiIndex == kanjiItem.kanjiIndex);
+			}
+			else {
+				var valReading = that.normalizeReadings ? that.normalizeReading(val.selectedReading) : val.selectedReading;
+				var itemReading = that.normalizeReadings ? that.normalizeReading(kanjiItem.selectedReading) : kanjiItem.selectedReading;
+				kanjiMatch = (val.kanjiIndex == kanjiItem.kanjiIndex && valReading == itemReading);
+			}
+
+			if(kanjiMatch) {
+				matchFound = true;
+				return false; //return false breaks us out of the .each() loop
+			}
 		}
 	});
 
 	return matchFound;
 }
 
+KanjiPairs.prototype.getFillForKanji = function(kanjiIndex) {
+	var that = this;
+	var numAltFills = this.altCardFills.length;
+	var kanjiFill = this.cardFill;
+	if(this.kanjiAlternateFills.hasOwnProperty(kanjiIndex)) {
+		var cardFillsIndex = (this.kanjiAlternateFills[kanjiIndex] % numAltFills) - 1;
+		var kanjiFill = this.altCardFills[cardFillsIndex];
+		this.kanjiAlternateFills[kanjiIndex] += 1;
+	}
+	else {
+		this.kanjiAlternateFills[kanjiIndex] = 1;
+	}
+
+	return kanjiFill;
+}
+
 KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 	var that = this;
+	var cardFillVals = this.getFillForKanji(kanjiItem.kanjiIndex);
+	var cardFillString = 'rgb(' + cardFillVals.red + ', ' + cardFillVals.green + ', ' + cardFillVals.blue + ')';
 	var newCardBack = this.pairsCanvas.display.rectangle({
 		x: xPos,
 		y: yPos,
 		width: this.cardWidth,
 		height: this.cardHeight,
-		fill: this.cardFill,
+		fill: cardFillString,
 		stroke: this.cardStroke,
 		shadow: this.cardShadow
 	});
@@ -358,15 +445,27 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 					this.flipped = true;
 				}
 				if(that.flippedCards.length > 1) {
-					if(that.flippedCards[0].kanjiItem.selectedReading == this.kanjiItem.selectedReading) {
-						that.flippedCards[0].unbind('click tap', that.flippedCards[0].clickHandler);
-						this.unbind('click tap', this.clickHandler);
-						that.flippedCards[0].fill = that.matchedCardFill;
-						that.toggleCard(that.flippedCards[0], 'both');
-						this.fill = that.matchedCardFill;
-						that.toggleCard(this, 'both');
-						this.matchedCard = true;
-						that.flippedCards[0].matchedCard = true;
+					var firstCard = that.flippedCards[0];
+					var secondCard = this;
+
+					if(that.normalizeReadings) {
+						var firstCardReading = that.normalizeReading(firstCard.kanjiItem.selectedReading);
+						var secondCardReading = that.normalizeReading(secondCard.kanjiItem.selectedReading);
+					}
+					else {
+						var firstCardReading = firstCard.kanjiItem.selectedReading;
+						var secondCardReading = secondCard.kanjiItem.selectedReading;
+					}
+
+					if(firstCardReading == secondCardReading) {
+						firstCard.unbind('click tap', firstCard.clickHandler);
+						secondCard.unbind('click tap', secondCard.clickHandler);
+						firstCard.fill = that.matchedCardFill;
+						that.toggleCard(firstCard, 'both');
+						secondCard.fill = that.matchedCardFill;
+						that.toggleCard(secondCard, 'both');
+						secondCard.matchedCard = true;
+						firstCard.matchedCard = true;
 						var autoShuffleSetting = $(that.autoShuffleControlSelector).find('input:checked');
 						if(autoShuffleSetting.length && autoShuffleSetting.val() == 'attempt') {
 							that.shuffleCards();
@@ -384,7 +483,7 @@ KanjiPairs.prototype.addCard = function(kanjiItem, xPos, yPos, delayRedraw) {
 									that.shuffleCards();
 								}
 							}, kanjiPairsObj.flipBackTimeout * 1000);
-						})(that.flippedCards[0], this, that);
+						})(firstCard, secondCard, that);
 					}
 					while(that.flippedCards.length) {
 						that.flippedCards.pop();
@@ -560,6 +659,7 @@ KanjiPairs.prototype.initializeControls = function() {
 
 KanjiPairs.prototype.newCardSet = function() {
 	this.usedReadings.length = 0;
+	this.kanjiAlternateFills = {};
 	this.clearAllCards();
 	this.filterKanjiSet();
 	this.layoutCards(this.numberOfCards);
