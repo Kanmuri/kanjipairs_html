@@ -655,6 +655,37 @@ KanjiPairs.prototype.initializeControls = function() {
 	if(!autoShuffleControl.find('input:checked').length) {
 		autoShuffleControl.find('input[value=off]').prop('checked', 'true');
 	}
+
+	$('[kanjipairs-control=filter-controls]').dialog({
+		autoOpen: false,
+		modal: true,
+		width: 700
+	});
+
+	$('[kanjipairs-control=show-filters-button]').on('click', function(event) {
+		$('[kanjipairs-control=filter-controls]').dialog('open');
+	});
+
+	$('[kanjipairs-control=settings-controls]').dialog({
+		autoOpen: false,
+		modal: true,
+		width: 700
+	});
+
+	$('[kanjipairs-control=show-settings-button]').on('click', function(event) {
+		$('[kanjipairs-control=settings-controls]').dialog('open');
+	});
+
+	$('[kanjipairs-control=about-kanjipairs]').dialog({
+		autoOpen: false,
+		modal: true,
+		width: 700
+	});
+
+	$('[kanjipairs-control=about-kanjipairs-button]').on('click', function(event) {
+		$('[kanjipairs-control=about-kanjipairs]').dialog('open');
+	});
+
 }
 
 KanjiPairs.prototype.newCardSet = function() {

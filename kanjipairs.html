@@ -19,90 +19,105 @@
 		</div>
 
 		<div class="side-control">
-			<div class="filter-header">
-				These filters are not mutually exclusive. <br />
-				It's possible to select a filter set that has no kanji <br />
-				If you get no cards after hitting "New Set", try different filters. <br />
-				<br />
-			</div>
+			<input type="button" class="kanjipairs-button" kanjipairs-control="show-filters-button" value="Filters" />
 		</div>
 
 		<div class="side-control">
-			<div class="filter-header">
-				Check one or more grades to filter the next set by. <br /> 
-				These are (mostly) the grade/year in school in which <br />
-				the kanji is taught in the Japanese educational system. <br />
-				If none are checked, no filtering by grade level will be done.
-			</div>
-			<div class="multiselect-wrapper" kanjipairs-control="grade-level-filter">
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-1" name="grade-level" value="1" /> <label for="grade-level-1">First Grade (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-2" name="grade-level" value="2" /> <label for="grade-level-2">Second Grade (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-3" name="grade-level" value="3" /> <label for="grade-level-3">Third Grade (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-4" name="grade-level" value="4" /> <label for="grade-level-4">Fourth Grade (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-5" name="grade-level" value="5" /> <label for="grade-level-5">Fifth Grade (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-6" name="grade-level" value="6" /> <label for="grade-level-6">Sixth Grade (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-8" name="grade-level" value="8" /> <label for="grade-level-8">Junior High/Middle School (Jouyou Kanji)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-9" name="grade-level" value="9" /> <label for="grade-level-9">For use in names (Jinmeiyou Kanji - Set 1)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-10" name="grade-level" value="10" /> <label for="grade-level-10">For use in names (Jinmeiyou Kanji - Set 2)</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="grade-level-0" name="grade-level" value="0" /> <label for="grade-level-0">Grade Not Specified</label>
-				</div>
-			</div>
-			<div>
-				<input type="button" value="New Set" class="kanjipairs-button" kanjipairs-control="new-set-button" />
-				<input type="button" value="Shuffle" class="kanjipairs-button" kanjipairs-control="shuffle-button" />
-			</div>
-		</div>
-		<div class="side-control">
-			<div class="filter-header">
-				Check one or more JLPT levels to filter the next set by. <br />
-				These are the original JLPT levels, not the new "N" levels. <br />
-				There are no publicly available official lists of kanji for <br />
-				the new levels. (At least not at the time this dataset was <br />
-				created.) <br />
-				If none are checked, no filtering by JLPT level will be done. <br />
-			</div>
-			<div class="multiselect-wrapper" kanjipairs-control="jlpt-filter">
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="jlpt-level-1" name="jlpt-level" value="1" /> <label for="jlpt-level-1">JPLT Level 1</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="jlpt-level-2" name="jlpt-level" value="2" /> <label for="jlpt-level-2">JLPT Level 2</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="jlpt-level-3" name="jlpt-level" value="3" /> <label for="jlpt-level-3">JLPT Level 3</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="jlpt-level-4" name="jlpt-level" value="4" /> <label for="jlpt-level-4">JLPT Level 4</label>
-				</div>
-				<div class="checkbox-wrapper">
-					<input type="checkbox" id="jlpt-level-0" name="jlpt-level" value="0" /> <label for="jlpt-level-0">JLPT Level Not Specified</label>
-				</div>
-			</div>
-		</div>
-		<div class="side-control">
-			<div kanjipairs-control="stroke-count-filter"></div>
+			<input type="button" class="kanjipairs-button" kanjipairs-control="show-settings-button" value="Settings" />
 		</div>
 
-		<div id="bottom-controls">
+		<div class="side-control">
+			<input type="button" class="kanjipairs-button" kanjipairs-control="about-kanjipairs-button" value="About" />
+		</div>
+
+		<div kanjipairs-control="filter-controls">
+			<div class="side-control">
+				<div class="filter-header">
+					These filters are not mutually exclusive. <br />
+					It's possible to select a filter set that has no kanji <br />
+					If you get no cards after hitting "New Set", try different filters. <br />
+					<br />
+				</div>
+			</div>
+
+			<div class="side-control">
+				<div class="filter-header">
+					Check one or more grades to filter the next set by. <br /> 
+					These are (mostly) the grade/year in school in which <br />
+					the kanji is taught in the Japanese educational system. <br />
+					If none are checked, no filtering by grade level will be done.
+				</div>
+				<div class="multiselect-wrapper" kanjipairs-control="grade-level-filter">
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-1" name="grade-level" value="1" /> <label for="grade-level-1">First Grade (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-2" name="grade-level" value="2" /> <label for="grade-level-2">Second Grade (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-3" name="grade-level" value="3" /> <label for="grade-level-3">Third Grade (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-4" name="grade-level" value="4" /> <label for="grade-level-4">Fourth Grade (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-5" name="grade-level" value="5" /> <label for="grade-level-5">Fifth Grade (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-6" name="grade-level" value="6" /> <label for="grade-level-6">Sixth Grade (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-8" name="grade-level" value="8" /> <label for="grade-level-8">Junior High/Middle School (Jouyou Kanji)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-9" name="grade-level" value="9" /> <label for="grade-level-9">For use in names (Jinmeiyou Kanji - Set 1)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-10" name="grade-level" value="10" /> <label for="grade-level-10">For use in names (Jinmeiyou Kanji - Set 2)</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="grade-level-0" name="grade-level" value="0" /> <label for="grade-level-0">Grade Not Specified</label>
+					</div>
+				</div>
+				<div>
+					<input type="button" value="New Set" class="kanjipairs-button" kanjipairs-control="new-set-button" />
+					<input type="button" value="Shuffle" class="kanjipairs-button" kanjipairs-control="shuffle-button" />
+				</div>
+			</div>
+			<div class="side-control">
+				<div class="filter-header">
+					Check one or more JLPT levels to filter the next set by. <br />
+					These are the original JLPT levels, not the new "N" levels. <br />
+					There are no publicly available official lists of kanji for <br />
+					the new levels. (At least not at the time this dataset was <br />
+					created.) <br />
+					If none are checked, no filtering by JLPT level will be done. <br />
+				</div>
+				<div class="multiselect-wrapper" kanjipairs-control="jlpt-filter">
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="jlpt-level-1" name="jlpt-level" value="1" /> <label for="jlpt-level-1">JPLT Level 1</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="jlpt-level-2" name="jlpt-level" value="2" /> <label for="jlpt-level-2">JLPT Level 2</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="jlpt-level-3" name="jlpt-level" value="3" /> <label for="jlpt-level-3">JLPT Level 3</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="jlpt-level-4" name="jlpt-level" value="4" /> <label for="jlpt-level-4">JLPT Level 4</label>
+					</div>
+					<div class="checkbox-wrapper">
+						<input type="checkbox" id="jlpt-level-0" name="jlpt-level" value="0" /> <label for="jlpt-level-0">JLPT Level Not Specified</label>
+					</div>
+				</div>
+			</div>
+			<div class="side-control">
+				<div kanjipairs-control="stroke-count-filter"></div>
+			</div>
+		</div>
+
+		
+		<div id="bottom-controls" kanjipairs-control="settings-controls">
 			<div class="bottom-control">
 				<div class="horizontal-slider-display">
 					<label for="flip-back-timeout-seconds">Mismatch hide timeout (seconds):</label>
@@ -131,7 +146,19 @@
 			</div>
 		</div>
 
-		<div id="footer">
+		<div id="footer" kanjipairs-control="about-kanjipairs">
+			<p>
+				KanjiPairs is a Single HTML page Kanji Matching game. It was created with the goal in mind to make a small game in JavaScript that can be run by just grabbing the files and opening the base HTML file in a modern web browser. Of course, it can also be hosted on a web server for users to access w/o having to have it downloaded locally.
+			</p>
+
+			<p>
+				The game is a matching game where you pick two kanji and try to match on the reading given on the back of the card. A kanji may have many readings, but for the sake of the matching game, only one reading will be valid for matching against, the one shown on the back of the card.
+			</p>
+
+			<p>
+				This game does not communicate with or store any personal data on a server. If it's downloaded from a server, that's the only server interaction that happens. Filters and game settings are stored completely locally on the client (your web browser) via HTML 5 Local Storage.
+			</p>
+
 			<p>
 				The data used for this game comes from the <a href="http://www.csse.monash.edu.au/~jwb/kanjidic2/">KANJIDIC2 project</a>
 				and is Copyright the <a href="http://www.edrdg.org/edrdg/licence.html">Electronic Dictionary Research and Development Group</a>.
