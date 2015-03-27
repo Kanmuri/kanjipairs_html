@@ -18,18 +18,6 @@
 			<script type="text/javascript" src="kanjidata.js"></script>
 		</div>
 
-		<div class="side-control">
-			<input type="button" class="kanjipairs-button" kanjipairs-control="show-filters-button" value="Filters" />
-		</div>
-
-		<div class="side-control">
-			<input type="button" class="kanjipairs-button" kanjipairs-control="show-settings-button" value="Settings" />
-		</div>
-
-		<div class="side-control">
-			<input type="button" class="kanjipairs-button" kanjipairs-control="about-kanjipairs-button" value="About" />
-		</div>
-
 		<div kanjipairs-control="filter-controls">
 			<div class="side-control">
 				<div class="filter-header">
@@ -116,6 +104,18 @@
 			</div>
 		</div>
 
+		<div id="modal-buttons">
+			<div class="bottom-control">
+				<input type="button" class="kanjipairs-button" kanjipairs-control="show-dialog-button" kanjipairs-show-dialog-for="filter-controls" value="Filters" />
+				<input type="button" class="kanjipairs-button" kanjipairs-control="show-dialog-button" kanjipairs-show-dialog-for="settings-controls" value="Settings" />
+				<input type="button" class="kanjipairs-button" kanjipairs-control="show-dialog-button" kanjipairs-show-dialog-for="about-kanjipairs" value="About" />
+			</div>
+
+			<div class="bottom-control">
+				<input type="button" value="New Set" class="kanjipairs-button" kanjipairs-control="new-set-button" />
+				<input type="button" value="Shuffle" class="kanjipairs-button" kanjipairs-control="shuffle-button" />
+			</div>
+		</div>
 		
 		<div id="bottom-controls" kanjipairs-control="settings-controls">
 			<div class="bottom-control">

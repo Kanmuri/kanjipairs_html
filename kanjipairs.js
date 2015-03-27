@@ -56,6 +56,12 @@ KanjiPairs = function(kanjiData, numberOfCards) {
 		this.autoShuffleControlName
 	];
 
+	this.dialogsList = [
+		'filter-controls',
+		'settings-controls',
+		'about-kanjipairs'
+	];
+
 	this.normalizeReadings = true;
 	this.preventDuplicates = true;
 
@@ -656,36 +662,29 @@ KanjiPairs.prototype.initializeControls = function() {
 		autoShuffleControl.find('input[value=off]').prop('checked', 'true');
 	}
 
-	$('[kanjipairs-control=filter-controls]').dialog({
-		autoOpen: false,
-		modal: true,
-		width: 700
+	$.each(this.dialogsList, function(index, dialogName) {
+		$('[kanjipairs-control=' + dialogName +']').dialog({
+			autoOpen: false,
+			modal: true,
+			width: 700,
+			buttons: [
+				{
+					text: 'Close',
+					click: function() {
+						$(this).dialog('close');
+					}
+				}
+			]
+		});
+
 	});
 
-	$('[kanjipairs-control=show-filters-button]').on('click', function(event) {
-		$('[kanjipairs-control=filter-controls]').dialog('open');
+	$('[kanjipairs-control=show-dialog-button]').on('click', function(event) {
+		var dialogName = $(this).attr('kanjipairs-show-dialog-for');
+		$('[kanjipairs-control=' + dialogName +']').dialog('open');
 	});
 
-	$('[kanjipairs-control=settings-controls]').dialog({
-		autoOpen: false,
-		modal: true,
-		width: 700
-	});
-
-	$('[kanjipairs-control=show-settings-button]').on('click', function(event) {
-		$('[kanjipairs-control=settings-controls]').dialog('open');
-	});
-
-	$('[kanjipairs-control=about-kanjipairs]').dialog({
-		autoOpen: false,
-		modal: true,
-		width: 700
-	});
-
-	$('[kanjipairs-control=about-kanjipairs-button]').on('click', function(event) {
-		$('[kanjipairs-control=about-kanjipairs]').dialog('open');
-	});
-
+	$('.kanjipairs-button').button();
 }
 
 KanjiPairs.prototype.newCardSet = function() {

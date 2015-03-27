@@ -1,4 +1,4 @@
-#gameplay-area {
+#gameplay-area, .side-control, .bottom-control {
 	float: left;
 }
 
@@ -10,7 +10,7 @@
 	float: left;
 }
 
-#bottom-controls {
+#bottom-controls, #footer, #modal-buttons {
 	clear: both;
 }
 
@@ -49,8 +49,4 @@
 	margin-bottom: 25px;
 	background-color: blue;
 	color: white;
-}
-
-#footer {
-	clear: both;
 }
