@@ -3,7 +3,11 @@ Single HTML page Kanji Matching game
 
 The goal here is to make a small game in JavaScript that can be run by just grabbing the files and opening the base HTML file in a modern web browser.
 
-This app uses a trimmed-down JSON object based on the the KANJIDIC2 XML file for its datasource.
+Due to this self-imposed constraint of making the game playable from the local filesystem (i.e. via a `file://` URL), certain tradeoffs had to be made. For example:
+* Because JS modules cannot be used from `file://` URLs, all the JS code had to be loaded the tradtional way (i.e. using `script` tags with `type` of `text/javascript`)
+* JSON or XML files to read the kanji data from could not be read directly from the filesystem when using the `file://` protocol to serve the files, and thus the kanji data was instead rendered directly as a JS object in the `kanjidata.js` file
+
+This app uses a trimmed-down JS object based on the the KANJIDIC2 XML file for its datasource.
 This file is Copyright the [Electronic Dictionary Research and Development Group](http://www.edrdg.org/edrdg/licence.html) and is licensed under a [Creative Commons Attribution-ShareAlike License (V3.0)](http://creativecommons.org/licenses/by-sa/3.0/).
 
 The file itself is available from the [KANJIDIC2 project page](http://www.csse.monash.edu.au/~jwb/kanjidic2/).
@@ -18,7 +22,7 @@ The library <a href="http://touchpunch.furf.com/">jQuery UI Touch Punch</a> is u
 * As the card is flipped over a randomly chosen reading (on or kun) will be shown
 * Once a pair of cards is flipped over, one of two things will happen
   1. If the readings of those two cards match, then both "sides" of the card become visible and those cards are no longer clickable
-  2. If the readings of those two cards don't match, then the cards are flipped over after a small delay
+  2. If the readings of those two cards don't match, then the cards are flipped over after a small (adjustable) delay
 
 # TODO
 * More filters?
